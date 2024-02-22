@@ -11,7 +11,7 @@
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
 
-            Console.WriteLine("\nTRANSFERÊNCIA VIA PIX - Banking Digio\n");
+            Console.WriteLine("\nBanking Digio - TRANSFERÊNCIA VIA PIX\n");
         }
 
         public static void Menu()
@@ -21,9 +21,9 @@
                 Telinha();
 
                 Console.WriteLine("DIGITE UMA OPÇÃO ABAIXO: \n");
-                Console.WriteLine("1 - Realizar Cadastro");
-                Console.WriteLine("2 - Entrar com CPF e Senha");
-                Console.WriteLine("3 - Sair ");
+                Console.WriteLine("[1] - Cadastrar");
+                Console.WriteLine("[2] - Transferir");
+                Console.WriteLine("[3] - Sair ");
 
                 opcao = int.Parse(Console.ReadLine());
 
@@ -33,7 +33,7 @@
                         Cadastro();
                         break;
                     case 2:
-                        Login();
+                        Transferir();
                         break;
                     case 3:
                         Environment.Exit(0);
@@ -62,101 +62,63 @@
             Console.WriteLine("Digite seu CPF:");
             string cpf = Console.ReadLine();
             if (string.IsNullOrEmpty(cpf)) throw new Exception("Campo [CPF] é obrigatório");
+            if (!Cliente.ValidarCPF(cpf)) throw new Exception("CPF inválido");
+            if (CPFCadastrado(cpf)) throw new Exception("CPF já cadastrado");
 
-            Console.WriteLine("Digite sua Chave PIX:");
+            Console.WriteLine("Digite a Chave Pix:");
             string chavePix = Console.ReadLine();
             if (string.IsNullOrEmpty(chavePix)) throw new Exception("Campo [Chave Pix] é obrigatório");
-
-            Console.WriteLine("Digite sua senha:");
-            string senha = Console.ReadLine();
-            if (string.IsNullOrEmpty(senha)) throw new Exception("Campo [Senha] é obrigatório");
+            if (!Cliente.ValidarPix(chavePix)) throw new Exception("Chave Pix inválido");
+            if (PixCadastrado(chavePix)) throw new Exception("Chave Pix já cadastrado");
 
             Cliente cliente = new();
 
             cliente.Nome = nome;
             cliente.CPF = cpf;
             cliente.Pix = chavePix;
-            cliente.Senha = senha;
 
             clientes.Add(cliente);
 
-            Console.WriteLine("\nCliente cadastrado com sucesso!\n");
-
-            Thread.Sleep(2000);
-            Logado(cliente);
-        }
-
-        private static void Login()
-        {
             Telinha();
 
-            Console.WriteLine("Digite seu CPF:");
-            string cpf = Console.ReadLine();
-            if (string.IsNullOrEmpty(cpf)) throw new Exception("Campo [CPF] é obrigatório");
+            Console.WriteLine("Cadastro realizado com sucesso!\n");
+            Console.WriteLine("Confira seus dados abaixo:");
+            Console.WriteLine($"NOME: {nome} \nCPF: {cpf} \nCHAVE PIX: {chavePix}");
 
-            Console.WriteLine("Digite sua Senha:");
-            string senha = Console.ReadLine();
-            if (string.IsNullOrEmpty(senha)) throw new Exception("Campo [Senha] é obrigatório");
-
-            var cliente = clientes.FirstOrDefault(x => x.CPF == cpf && x.Senha == senha);
-
-            if (cliente != null)
-            {
-                Logado(cliente);
-            }
-            else
-            {
-                Console.WriteLine("CPF ou Senha invalida!");
-
-                Thread.Sleep(2000);
-                Menu();
-            }
+            Voltar();
         }
 
-        private static void Perfil(Cliente cliente)
+        private static bool CPFCadastrado(string cpf)
         {
-            Console.WriteLine($"NOME: {cliente.Nome} | CPF: {cliente.CPF} | CHAVE PIX: {cliente.Pix} | SALDO: R${cliente.Saldo}\n");
-        }
-
-        private static void Logado(Cliente cliente)
-        {
-            try
+            foreach (Cliente cliente in clientes)
             {
-                Telinha();
-                Perfil(cliente);
-
-                Console.WriteLine("DIGITE UMA OPÇÃO ABAIXO: \n");
-                Console.WriteLine("1 - Transferência via PIX");
-                Console.WriteLine("2 - Sair");
-
-                opcao = int.Parse(Console.ReadLine());
-                switch (opcao)
+                if (cliente.CPF == cpf)
                 {
-                    case 1:
-                        Transferencia(cliente);
-                        break;
-                    case 2:
-                        Menu();
-                        break;
-                    default:
-                        Logado(cliente);
-                        break;
+                    return true;
                 }
             }
-            catch (Exception erro)
-            {
-                Console.WriteLine(erro.Message);
-                Thread.Sleep(2000);
-                Logado(cliente);
-            }
+
+            return false;
         }
 
-        private static void Transferencia(Cliente cliente)
+        private static bool PixCadastrado(string chavePix)
+        {
+            foreach (Cliente cliente in clientes)
+            {
+                if (cliente.Pix == chavePix)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void Transferir()
         {
             Telinha();
-            Perfil(cliente);
 
-            Console.WriteLine("Digite a chave PIX: ");
+            Console.WriteLine("Digite a Chave Pix:");
             string chavePix = Console.ReadLine();
             if (string.IsNullOrEmpty(chavePix)) throw new Exception("Campo [Chave PIX] é obrigatório");
 
@@ -164,29 +126,31 @@
 
             if (pix == null)
             {
-                throw new Exception("Pix digitado não foi encontrada.");
+                throw new Exception("Chave Pix digitada não foi encontrada, verifique os dados e tente novamente");
             }
 
-            if (chavePix == cliente.Pix)
-            {
-                throw new Exception("Não conseguimos realizar a transferência para este pix");
-            }
-
-            Console.WriteLine("Digite o valor: ");
+            Console.WriteLine("Digite o valor da transferência: ");
             double valorPix = double.Parse(Console.ReadLine());
 
-            if (valorPix <= cliente.Saldo && valorPix > 0)
+            if (valorPix > 0)
             {
-                cliente.TransferenciaPix(pix, valorPix);
-                Console.WriteLine("Pix realizando com sucesso!");
-            }
-            else
-            {
-                Console.WriteLine("Saldo insuficiente!");
+                Console.WriteLine("\nPIX enviado com sucesso\n");
+                Console.WriteLine($"Confira para quem foi: ");
+                Console.WriteLine($"NOME: {pix.Nome} \nCPF: {pix.CPF} \nCHAVE PIX: {pix.Pix}");
             }
 
-            Thread.Sleep(2000);
-            Logado(cliente);
+            Voltar();
+        }
+
+        private static void Voltar()
+        {
+            Console.WriteLine("\nDigite [ 1 ] para voltar\n");
+            opcao = int.Parse(Console.ReadLine());
+
+            if(opcao == 1)
+            {
+                Menu();
+            }
         }
     }
 }

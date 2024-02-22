@@ -4,21 +4,16 @@
     {
         public string Nome { get; set; } = string.Empty;
         public string CPF { get; set; } = string.Empty;
-        public string Senha { get; set; } = string.Empty;
         public string Pix { get; set; } = string.Empty;
 
-        public double Saldo = 1000;
-
-        public bool TransferenciaPix(Cliente chavePix, double valor)
+        public static bool ValidarCPF(string cpf)
         {
-            if (valor > Saldo)
-            {
-                return false;
-            }
+            return cpf.Length == 11;
+        }
 
-            this.Saldo -= valor;
-            chavePix.Saldo += valor;
-            return true;
+        public static bool ValidarPix(string chavePix)
+        {
+            return chavePix.Length >= 6;
         }
     }
 }
