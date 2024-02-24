@@ -134,9 +134,12 @@
 
             if (valorPix > 0)
             {
-                Console.WriteLine("\nPIX enviado com sucesso\n");
-                Console.WriteLine($"Confira para quem foi: ");
-                Console.WriteLine($"NOME: {pix.Nome} \nCPF: {pix.CPF} \nCHAVE PIX: {pix.Pix}");
+                Console.WriteLine("\nPIX enviado com sucesso");
+                Console.WriteLine($"Para {pix.Nome} no valor de R${valorPix}");
+            }
+            else
+            {
+                Console.WriteLine("Não foi possível realizar essa transferência");
             }
 
             Voltar();
