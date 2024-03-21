@@ -1,6 +1,6 @@
 # Desafio Chave Pix
 
-## Descrição do problema
+### Descrição do problema
 Mariana é dona do banco “Banking Digio” e precisa criar um sistema onde seus clientes possam:
   - Se cadastrar
   - Realizar transferências por PIX
